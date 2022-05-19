@@ -1,14 +1,20 @@
 #include "e.h"
 int C::random_data( vector<C*> &arr, vector<CFactory*> &f){ //просто рандомное заполнение
-    srand(time(nullptr));
- //   int len=rand() % 20+1;
-    int len=10000000; //это чтобы openmp протестить
-    C *r = f[rand() % 2]->create(); //это фабрика создала объект, типы объектов называем 0 и 1, строку а
+    int len=rand() % 20+1;
+    int Type0=rand() % 2;
+    int Type1=rand() % 2;
+    #ifdef _type0
+    Type0=0;Type1=0;
+    #endif
+    #ifdef _type1
+    Type0=1;Type1=1;
+    #endif
+    C *r = f[Type0]->create(); //это фабрика создала объект, типы объектов называем 0 и 1, строку а
     for (int i = 0; i <len ; i++) {
         r->a.push_back(rand() % 20+1);
     }
     arr.push_back(r);
-    C *p = f[rand() % 2]->create(); //строку б
+    C *p = f[Type1]->create(); //строку б
     for (int i = 0; i <len ; i++) {
         p->a.push_back(rand() % 20+1);
     }
@@ -85,23 +91,34 @@ int C::execute( vector<C*> &arr, vector<CFactory*> &f){
         else return i+1;
     };
     
-    time(&t1);
+    clock_t start = clock();
+    #ifdef _OPENMP
     #pragma omp parallel for //распараллеливание создания с, действует так что одновременно и независимо друг от друга для разных i делается действие в цикле 
     for (size_t i=0;i<arr[0]->a.size();i++){ // для сравнения времени 2 вида одного и того же, с распараллеливанием и без него
         bitset<64> x(arr[0]->a[i]), y(arr[1]->a[i]);
         int z=lambda_fun(x) + lambda_fun(y);
         r->a[i]=z;
+        
     }
-    time(&t2);
-    cout << "parallel time: " << t2-t1 << endl;
-    time(&t1);
+    clock_t end = clock();
+    cout << "parallel time: " << (end - start) << endl;
+    #endif
+    clock_t start1 = clock();
     for (size_t i=0;i<arr[0]->a.size();i++){
         bitset<64> x(arr[0]->a[i]), y(arr[1]->a[i]);
         int z=lambda_fun(x) + lambda_fun(y);
         r->a[i]=z;
     }
-    time(&t2);
-    cout << "nonparallel time: " << t2-t1 << endl;
+    clock_t end1 = clock();
+    cout << "nonparallel time: " << (end1 - start1) << endl;
     arr.push_back(r);
+    return 0;
+}
+
+int C::out( vector<C*> &arr){
+    for (size_t i=0;i<arr.size();i++){ // для сравнения времени 2 вида одного и того же, с распараллеливанием и без него
+        for (int n : arr[i]->a){cout<< n<<" ";}
+        cout<<"\n";
+    }
     return 0;
 }
