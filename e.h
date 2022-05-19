@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <time.h>
+#include <omp.h>
 using namespace std;
 class CFactory; //это фабрика, про нее не было прописано в задании, но создавать объекты класса с помощью нее легче, для этого она вообще и создана
 class C{//сам класс
@@ -18,6 +19,7 @@ class C{//сам класс
     static int read_data(const char *file, vector<C*> &arr, vector<CFactory*> &f);
     static int random_data( vector<C*> &arr, vector<CFactory*> &f);
     static int execute(vector<C*> &arr, vector<CFactory*> &f);
+    static int out(vector<C*> &arr);
     
 
 };
