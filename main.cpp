@@ -2,7 +2,7 @@
 
 int main(void)
 {
-    setlocale (LC_ALL, "ru");
+    srand(time(0));
     int input, err;
     vector<CFactory *> f = {new CFactoryCData0(), new CFactoryCData1()}; //вектор фабрик
 	vector <C*> arr;//вектор элементов класса, их будет в итоге 3, элемент для последовательности а, б, с
@@ -11,7 +11,7 @@ int main(void)
     << "2. Генерировать рандомно." << endl;
     cin >> input;
     
-    switch (input) {
+   switch (input) {
         case 1:
 	        err=C::read_data("1.txt", arr, f);
             break;
@@ -77,11 +77,23 @@ int main(void)
 	       }
             return -5;
     }
+    #ifdef _output
     cout << "Последовательность А: ";
- //   arr[0]->output(); //пока закоменчен вывод (такой потому что разный для разных наследников)
+    arr[0]->output(); 
     cout << "Последовательность B: "; // так как для проверки распараллеливания в рандомном вводе стоит огромное число, если раскоментить будет минут 10 выводить
- //   arr[1]->output();
+    arr[1]->output();
     C::execute( arr, f);
     cout << "Последовательность C: ";
-//    arr[2]->output();
+    arr[2]->output();
+    #else
+    C::execute( arr, f);
+    C::out( arr);    
+    #endif
+    delete f[0];
+    delete f[1];
+    f[0]=f[1]=NULL;
+	for(size_t i = 0; i < arr.size(); i++){
+		 delete arr[i];
+		 arr[i] = NULL;
+	 }
 }
